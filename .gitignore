@@ -144,3 +144,22 @@ patches/
 black.sh
 run_sphinx.sh
 publish.sh
+
+# PDF
+*.pdf
+
+# Temp Folders
+*MG5_debug*
+*models/
+*data/
+*logs/
+
+# junk
+*#
+*.pyc
+
+# datasets / ML models
+*.h5
+*.npy
+*.pt
+*.json

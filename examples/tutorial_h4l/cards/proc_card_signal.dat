@@ -1,0 +1,12 @@
+import model sm_modified_hzz
+
+define p = g u c d s u~ c~ d~ s~
+define j = g u c d s u~ c~ d~ s~
+define l+ = e+ mu+
+define l- = e- mu-
+define vl = ve vm vt
+define vl~ = ve~ vm~ vt~
+define za = z
+generate p p > j j za za QCD=0 QED=4, za > e+ e-, za > mu+ mu-
+add process p p > j j za za QCD=0 QED=4, za > e+ e-, za > e+ e-
+add process p p > j j za za QCD=0 QED=4, za > mu+ mu-, za > mu+ mu-

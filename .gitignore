@@ -150,6 +150,7 @@ publish.sh
 
 # Temp Folders
 *MG5_debug*
+mg_processes/
 *models/
 *data/
 *logs/

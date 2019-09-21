@@ -55,7 +55,6 @@ for key in logging.Logger.manager.loggerDict:
 # In[3]:
 
 
-#sampler = SampleAugmenter('data/lhe_data_shuffled.h5')
 sampler = SampleAugmenter('data/delphes_data_shuffled.h5')
 
 

@@ -28,7 +28,7 @@ from madminer.delphes import DelphesReader
 from madminer.sampling import combine_and_shuffle
 from madminer.plotting import plot_distributions
 import sys
-runIteration = sys.argv[1]
+runIteration = int(sys.argv[1])
 
 # In[2]:
 
@@ -75,35 +75,53 @@ miner.load("data/setup.h5")
 
 # In[5]:
 
-miner.run(
-    sample_benchmark='sm',
-    mg_directory=mg_dir,
-    mg_process_directory='./mg_processes/signal_pythia_runIter{}'.format(runIteration),
-    proc_card_file='cards/proc_card_signal.dat',
-    param_card_template_file='cards/param_card_h4l_WZHModified_MGdefault_template.dat',
-    pythia8_card_file='cards/pythia8_card.dat',
-    run_card_file='cards/run_card_signal_h4l.dat',
-    log_directory='logs/signal',
-    initial_command="source activate python2",
-)
+# Create new run card
+bashCommand = "cp cards/run_card_signal_h4l.dat temp/run_card_signal_h4l_runIter{}.dat".format(runIteration)
+import subprocess
+process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+output, error = process.communicate()
+print (output)
+print (error)
+
+# add unique random seed that's far away from other directories 
+#(sucessive processes will automatically get different seed in run_multiple() )
+subprocess.call(["sed", "-i", "-e",  "/iseed/s/0/{}/".format(runIteration*20 + 20), "temp/run_card_signal_h4l_runIter{}.dat".format(runIteration)])
+# import fileinput
+# for line in fileinput.input("temp/run_card_signal_h4l_runIter{}.dat".format(runIteration), inplace=True):
+#     # inside this loop the STDOUT will be redirected to the file
+#     # the comma after each print statement is needed to avoid double line breaks
+#     print line.replace("0    = iseed", "{}    = iseed".format(runIteration*20 + 20)),
+
+# miner.run(
+#     sample_benchmark='sm',
+#     mg_directory=mg_dir,
+#     mg_process_directory='./mg_processes/signal_pythia_runIter{}'.format(runIteration),
+#     proc_card_file='cards/proc_card_signal.dat',
+#     param_card_template_file='cards/param_card_h4l_WZHModified_MGdefault_template.dat',
+#     pythia8_card_file='cards/pythia8_card.dat',
+#     run_card_file='cards/run_card_signal_h4l.dat',
+#     log_directory='logs/signal',
+#     initial_command="source activate python2",
+# )
 
 
 # In[6]:
 
-
-additional_benchmarks = ['no-higgs', '5sq-higgs']
-
+benchmarks = ['sm', 'no-higgs', '5sq-higgs']
+#additional_benchmarks = ['no-higgs', '5sq-higgs']
 
 # In[7]:
 
 miner.run_multiple(
-    sample_benchmarks=additional_benchmarks,
+    #sample_benchmarks=additional_benchmarks,
+    sample_benchmarks=benchmarks,
     mg_directory=mg_dir,
-    mg_process_directory='./mg_processes/signal_pythia2_runIter{}'.format(runIteration),
+    mg_process_directory='./mg_processes/signal_pythia_all_runIter{}'.format(runIteration),
     proc_card_file='cards/proc_card_signal.dat',
     param_card_template_file='cards/param_card_h4l_WZHModified_MGdefault_template.dat',
     pythia8_card_file='cards/pythia8_card.dat',
-    run_card_files=['cards/run_card_signal_h4l.dat'],
+    #run_card_files=['cards/run_card_signal_h4l.dat'],
+    run_card_files=["temp/run_card_signal_h4l_runIter{}.dat".format(runIteration)],
     log_directory='logs/signal',
     initial_command="source activate python2",
 )
@@ -156,18 +174,27 @@ delphes = DelphesReader('data/setup.h5')
 # In[10]:
 
 
-delphes.add_sample(
-    lhe_filename='mg_processes/signal_pythia_runIter{}/Events/run_01/unweighted_events.lhe.gz'.format(runIteration),
-    hepmc_filename='mg_processes/signal_pythia_runIter{}/Events/run_01/tag_1_pythia8_events.hepmc.gz'.format(runIteration),
-    sampled_from_benchmark='sm',
-    is_background=False,
-    #k_factor=1.1,
-)
+# delphes.add_sample(
+#     lhe_filename='mg_processes/signal_pythia_runIter{}/Events/run_01/unweighted_events.lhe.gz'.format(runIteration),
+#     hepmc_filename='mg_processes/signal_pythia_runIter{}/Events/run_01/tag_1_pythia8_events.hepmc.gz'.format(runIteration),
+#     sampled_from_benchmark='sm',
+#     is_background=False,
+#     #k_factor=1.1,
+# )
 
-for i, benchmark in enumerate(additional_benchmarks):
+# for i, benchmark in enumerate(additional_benchmarks):
+#     delphes.add_sample(
+#         lhe_filename='mg_processes/signal_pythia2_runIter{}/Events/run_0{}/unweighted_events.lhe.gz'.format(runIteration, i+1),
+#         hepmc_filename='mg_processes/signal_pythia2_runIter{}/Events/run_0{}/tag_1_pythia8_events.hepmc.gz'.format(runIteration, i+1),
+#         sampled_from_benchmark=benchmark,
+#         is_background=False,
+#         #k_factor=1.1,
+#     )
+
+for i, benchmark in enumerate(benchmarks):
     delphes.add_sample(
-        lhe_filename='mg_processes/signal_pythia2_runIter{}/Events/run_0{}/unweighted_events.lhe.gz'.format(runIteration, i+1),
-        hepmc_filename='mg_processes/signal_pythia2_runIter{}/Events/run_0{}/tag_1_pythia8_events.hepmc.gz'.format(runIteration, i+1),
+        lhe_filename='mg_processes/signal_pythia_all_runIter{}/Events/run_0{}/unweighted_events.lhe.gz'.format(runIteration, i+1),
+        hepmc_filename='mg_processes/signal_pythia_all_runIter{}/Events/run_0{}/tag_1_pythia8_events.hepmc.gz'.format(runIteration, i+1),
         sampled_from_benchmark=benchmark,
         is_background=False,
         #k_factor=1.1,
@@ -225,6 +252,17 @@ delphes.add_observable(
     required=True,
 )
 
+delphes.add_observable(
+    'm4l',
+    '(l[0] + l[1] + l[2] + l[3]).m',
+    required=True,
+)
+
+delphes.add_observable(
+    'delta_eta_jj',
+    'j[0].deltaeta(j[1]) * (-1. + 2.*float(j[0].eta > j[1].eta))',
+    required=True,
+)
 
 # We can also add cuts, again in parse-able strings. In addition to the objects discussed above, they can contain the observables:
 

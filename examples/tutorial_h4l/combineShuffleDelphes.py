@@ -27,6 +27,7 @@ path = "./data/"
 delphesDatasetList = [f for f in glob.glob(path + "delphes_data?.h5")]
 delphesDatasetList += [f for f in glob.glob(path + "delphes_data??.h5")]
 delphesDatasetList += [f for f in glob.glob(path + "delphes_data???.h5")]
+delphesDatasetList += [f for f in glob.glob(path + "delphes_data????.h5")]
 #delphesDatasetList = ['data/delphes_data.h5'.format(i) for i in range (1,201)]
 
 combine_and_shuffle(

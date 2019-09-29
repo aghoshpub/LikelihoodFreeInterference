@@ -78,7 +78,7 @@ sampler = SampleAugmenter('data/delphes_data_shuffled.h5')
 x, theta0, theta1, y, r_xz, t_xz, n_effective = sampler.sample_train_ratio(
     theta0=sampling.random_morphing_points(10, [('flat', 0., 5.)]),
     theta1=sampling.benchmark('sm'),
-    n_samples=100000,
+    n_samples=7*10**5, #100000,
     #n_samples=10**6,
     folder='./data/samples',
     filename='train_ratio',
@@ -94,7 +94,7 @@ x, theta0, theta1, y, r_xz, t_xz, n_effective = sampler.sample_train_ratio(
 
 _ = sampler.sample_test(
     theta=sampling.benchmark('sm'),
-    n_samples=5000,
+    n_samples=5*10**4,
     folder='./data/samples',
     filename='test'
 )

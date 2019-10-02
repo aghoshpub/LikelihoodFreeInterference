@@ -107,7 +107,7 @@ subprocess.call(["sed", "-i", "-e",  "/iseed/s/0/{}/".format(runIteration*20 + 2
 
 # In[6]:
 
-benchmarks = ['sm', 'no-higgs', '5sq-higgs']
+benchmarks = ['sm', 'no-higgs','2sq-higgs', '5sq-higgs']
 #additional_benchmarks = ['no-higgs', '5sq-higgs']
 
 # In[7]:

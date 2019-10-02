@@ -77,7 +77,7 @@ sampler = SampleAugmenter('data/delphes_data_shuffled.h5')
 
 x, theta, t_xz, _ = sampler.sample_train_density(
     theta=sampling.random_morphing_points(10, [('flat', 0., 5.)]),
-    n_samples=100000,
+    n_samples=4*10**5, #100000,
     #n_samples=10**6,
     folder='./data/samples',
     filename='train_density',
@@ -92,7 +92,7 @@ x, theta, t_xz, _ = sampler.sample_train_density(
 
 _ = sampler.sample_test(
     theta=sampling.benchmark('sm'),
-    n_samples=5000,
+    n_samples=5*10**4,
     folder='./data/samples',
     filename='test'
 )

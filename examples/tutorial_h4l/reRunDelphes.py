@@ -28,7 +28,8 @@ from madminer.delphes import DelphesReader
 from madminer.sampling import combine_and_shuffle
 from madminer.plotting import plot_distributions
 import sys
-runIteration = int(sys.argv[1])
+import glob
+runIt = int(sys.argv[1])
 
 # In[2]:
 
@@ -64,106 +65,6 @@ mg_dir = '/home/software/MG5_aMC_v2_6_2/'
 miner = MadMiner()
 miner.load("data/setup.h5")
 
-
-# In a next step, MadMiner starts MadGraph and Pythia to generate events and calculate the weights. You can use `run()` or `run_multiple()`; the latter allows to generate different runs with different run cards and optimizing the phase space for different benchmark points. 
-# 
-# In either case, you have to provide paths to the process card, run card, param card (the entries corresponding to the parameters of interest will be automatically adapted), and an empty reweight card. Log files in the `log_directory` folder collect the MadGraph output and are important for debugging.
-# 
-# The `sample_benchmark` (or in the case of `run_all`, `sample_benchmarks`) option can be used to specify which benchmark should be used for sampling, i.e. for which benchmark point the phase space is optimized. If you just use one benchmark, reweighting to far-away points in parameter space can lead to large event weights and thus large statistical fluctuations. It is therefore often a good idea to combine at least a few different benchmarks for this option. Here we use the SM and the benchmark "w" that we defined during the setup step.
-# 
-# One slight annoyance is that MadGraph only supports Python 2. The `run()` and `run_multiple()` commands have a keyword `initial_command` that let you load a virtual environment in which `python` maps to Python 2 (which is what we do below). Alternatively / additionally you can set `python2_override=True`, which calls `python2.7` instead of `python` to start MadGraph.
-
-# In[5]:
-
-# Create new run card
-bashCommand = "cp cards/run_card_signal_h4l.dat temp/run_card_signal_h4l_runIter{}.dat".format(runIteration)
-import subprocess
-process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
-output, error = process.communicate()
-print (output)
-print (error)
-
-# add unique random seed that's far away from other directories 
-#(sucessive processes will automatically get different seed in run_multiple() )
-subprocess.call(["sed", "-i", "-e",  "/iseed/s/0/{}/".format(runIteration*20 + 20), "temp/run_card_signal_h4l_runIter{}.dat".format(runIteration)])
-# import fileinput
-# for line in fileinput.input("temp/run_card_signal_h4l_runIter{}.dat".format(runIteration), inplace=True):
-#     # inside this loop the STDOUT will be redirected to the file
-#     # the comma after each print statement is needed to avoid double line breaks
-#     print line.replace("0    = iseed", "{}    = iseed".format(runIteration*20 + 20)),
-
-# miner.run(
-#     sample_benchmark='sm',
-#     mg_directory=mg_dir,
-#     mg_process_directory='./mg_processes/signal_pythia_runIter{}'.format(runIteration),
-#     proc_card_file='cards/proc_card_signal.dat',
-#     param_card_template_file='cards/param_card_h4l_WZHModified_MGdefault_template.dat',
-#     pythia8_card_file='cards/pythia8_card.dat',
-#     run_card_file='cards/run_card_signal_h4l.dat',
-#     log_directory='logs/signal',
-#     initial_command="source activate python2",
-# )
-
-
-# In[6]:
-
-benchmarks = ['sm', 'no-higgs','5-higgs', '16-higgs']
-#additional_benchmarks = ['no-higgs', '5sq-higgs']
-
-# In[7]:
-
-miner.run_multiple(
-    #sample_benchmarks=additional_benchmarks,
-    sample_benchmarks=benchmarks,
-    mg_directory=mg_dir,
-    mg_process_directory='./mg_processes/signal_pythia_all_runIter{}'.format(runIteration),
-    proc_card_file='cards/proc_card_signal.dat',
-    param_card_template_file='cards/param_card_h4l_WZHModified_MGdefault_template.dat',
-    pythia8_card_file='cards/pythia8_card.dat',
-    #run_card_files=['cards/run_card_signal_h4l.dat'],
-    run_card_files=["temp/run_card_signal_h4l_runIter{}.dat".format(runIteration)],
-    log_directory='logs/signal',
-    initial_command="source activate python2",
-)
-
-
-# This will take a moment -- time for a coffee break!
-# 
-# After running any event generation through MadMiner, you should check whether the run succeeded: are the usual output files there (LHE and HepMC), do the log files show any error messages? MadMiner does not (yet) perform any explicit checks, and if something went wrong in the event generation, it will only notice later when trying to load the event files.
-
-# ### Backgrounds
-
-# We can also easily add other processes like backgrounds. An important option is the `is_background` keyword, which should be used for processes that do *not* depend on the parameters theta. `is_background=True` will disable the reweighting and re-use the same weights for all cross sections.
-# 
-# To reduce the runtime of the notebook, the background part is commented out here. Feel free to activate it and let it run during a lunch break.
-
-# In[8]:
-
-
-"""
-miner.run(
-    is_background=True,
-    sample_benchmark='sm',
-    mg_directory=mg_dir,
-    mg_process_directory='./mg_processes/background_pythia',
-    proc_card_file='cards/proc_card_background.dat',
-    pythia8_card_file='cards/pythia8_card.dat',
-    param_card_template_file='cards/param_card_template.dat',
-    run_card_file='cards/run_card_background.dat',
-    log_directory='logs/background',
-)
-"""
-
-
-# Finally, note that both `MadMiner.run()` and `MadMiner.run_multiple()` have a `only_create_script` keyword. If that is set to True, MadMiner will not start the event generation directly, but prepare folders with all the right settings and ready-to-run bash scripts. This might make it much easier to generate Events on a high-performance computing system. 
-
-# ## 2. Run Delphes
-
-# The `madminer.delphes.DelphesReader` class wraps around Delphes, a popular fast detector simulation, to simulate the effects of the detector.
-
-# In[9]:
-
-
 delphes = DelphesReader('data/setup.h5')
 
 
@@ -171,34 +72,26 @@ delphes = DelphesReader('data/setup.h5')
 # 
 # In addition, you have to provide the information which sample was generated from which benchmark with the `sampled_from_benchmark` keyword, and set `is_background=True` for all background samples.
 
-# In[10]:
+# careful to keep same order of benchmarks as in the simulation file
 
+benchmarks = ['sm', 'no-higgs','1.5pow4-higgs', '2pow4-higgs'] 
+# Works up to 8 benchmarks
+assert len(benchmarks) < 9
 
-# delphes.add_sample(
-#     lhe_filename='mg_processes/signal_pythia_runIter{}/Events/run_01/unweighted_events.lhe.gz'.format(runIteration),
-#     hepmc_filename='mg_processes/signal_pythia_runIter{}/Events/run_01/tag_1_pythia8_events.hepmc.gz'.format(runIteration),
-#     sampled_from_benchmark='sm',
-#     is_background=False,
-#     #k_factor=1.1,
-# )
-
-# for i, benchmark in enumerate(additional_benchmarks):
-#     delphes.add_sample(
-#         lhe_filename='mg_processes/signal_pythia2_runIter{}/Events/run_0{}/unweighted_events.lhe.gz'.format(runIteration, i+1),
-#         hepmc_filename='mg_processes/signal_pythia2_runIter{}/Events/run_0{}/tag_1_pythia8_events.hepmc.gz'.format(runIteration, i+1),
-#         sampled_from_benchmark=benchmark,
-#         is_background=False,
-#         #k_factor=1.1,
-#     )
-
+path = "./mg_processes/"
 for i, benchmark in enumerate(benchmarks):
-    delphes.add_sample(
-        lhe_filename='mg_processes/signal_pythia_all_runIter{}/Events/run_0{}/unweighted_events.lhe.gz'.format(runIteration, i+1),
-        hepmc_filename='mg_processes/signal_pythia_all_runIter{}/Events/run_0{}/tag_1_pythia8_events.hepmc.gz'.format(runIteration, i+1),
-        sampled_from_benchmark=benchmark,
-        is_background=False,
-        #k_factor=1.1,
-    )
+    lhe_filename_list = [f for f in glob.glob(path + \
+    "signal_pythia_all_runIter{}*/Events/run_0{}/unweighted_events.lhe.gz".format(runIt, i+1))]
+  #"signal_pythia_all_runIter1/Events/run_0{}/unweighted_events.lhe.gz".format(i+1))] # For debug
+    for f in lhe_filename_list:
+        delphes.add_sample(
+            #lhe_filename='mg_processes/signal_pythia_all_runIter{}/Events/run_0{}/unweighted_events.lhe.gz'.format(runIteration, i+1),
+            lhe_filename=f,
+                hepmc_filename= (f[:-24] + 'tag_1_pythia8_events.hepmc.gz'), # works only for <9 benchmarks
+            sampled_from_benchmark=benchmark,
+            is_background=False,
+            #k_factor=1.1,
+        )
 
 """
 delphes.add_sample(
@@ -390,7 +283,6 @@ delphes.add_observable(
 # )
 delphes.add_default_observables(n_leptons_max=4, n_photons_max=0, n_jets_max=2, include_met=True, include_visible_sum=True, include_numbers=True, include_charge=True)
 
-
 # We can also add cuts, again in parse-able strings. In addition to the objects discussed above, they can contain the observables:
 
 # In[13]:
@@ -416,7 +308,7 @@ delphes.analyse_delphes_samples()
 # In[15]:
 
 
-delphes.save('data/delphes_data{}.h5'.format(runIteration))
+delphes.save('data/delphes_dataTenSections{}.h5'.format(runIt))
 
 
 # ## 5. Plot distributions
@@ -447,7 +339,9 @@ delphes.save('data/delphes_data{}.h5'.format(runIteration))
 
 
 # combine_and_shuffle(
-#     ['data/delphes_data.h5'],
-#     'data/delphes_data_shuffled.h5'
+#     ['data/delphes_dataAllTogether_.h5'],
+#     'data/delphes_dataAllTogether__shuffled.h5'
 # )
+
+
 

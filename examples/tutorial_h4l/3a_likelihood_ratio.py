@@ -76,10 +76,10 @@ sampler = SampleAugmenter('data/delphes_data_shuffled.h5')
 
 
 x, theta0, theta1, y, r_xz, t_xz, n_effective = sampler.sample_train_ratio(
-    theta0=sampling.random_morphing_points(10, [('flat', 0., 5.)]),
+    theta0=sampling.random_morphing_points(500, [('flat', 0., 16.)]),
     theta1=sampling.benchmark('sm'),
-    n_samples=4*10**5, #100000,
-    #n_samples=10**6,
+    #n_samples=4*10**5, #100000,
+    n_samples=3* 10**6,
     folder='./data/samples',
     filename='train_ratio',
     sample_only_from_closest_benchmark=True,
@@ -94,7 +94,7 @@ x, theta0, theta1, y, r_xz, t_xz, n_effective = sampler.sample_train_ratio(
 
 _ = sampler.sample_test(
     theta=sampling.benchmark('sm'),
-    n_samples=5*10**4,
+    n_samples=1*10**6,
     folder='./data/samples',
     filename='test'
 )
@@ -105,24 +105,27 @@ _ = sampler.sample_test(
 # In[6]:
 
 
-cmin, cmax = 10., 1000.
+#cmin, cmax = 10., 1000.
 
 cut = (y.flatten()==0)
 
 fig = plt.figure(figsize=(5,4))
 
 #sc = plt.scatter(theta0[cut][:,0], theta0[cut][:,1], c=n_effective[cut],
-sc = plt.scatter(np.reshape(theta0[cut], -1), np.reshape(theta0[cut],-1), c=np.reshape(n_effective[cut],-1),
-                 s=60., cmap='viridis',
-                 norm=matplotlib.colors.LogNorm(vmin=cmin, vmax=cmax),
+sc = plt.scatter(np.reshape(theta0[cut], -1), np.reshape(n_effective[cut],-1),
+                 s=60.,
                  marker='o')
+# plt.scatter(np.reshape(theta0[cut], -1), np.reshape(theta0[cut],-1), c=np.reshape(n_effective[cut],-1),
+#                  s=60., cmap='viridis',
+#                  norm=matplotlib.colors.LogNorm(vmin=cmin, vmax=cmax),
+#                  marker='o')
 
-cb = plt.colorbar(sc)
-cb.set_label('Effective number of samples')
+#cb = plt.colorbar(sc)
+#cb.set_label('Effective number of samples')
 
-plt.xlim(0.,5.)
-plt.ylim(0.,5.)
-plt.tight_layout()
+#plt.xlim(0.,2.)
+#plt.ylim(0.,2.)
+#plt.tight_layout()
 #plt.show()
 plt.savefig("effectiveNSamples.pdf")
 
@@ -134,13 +137,13 @@ plt.savefig("effectiveNSamples.pdf")
 # In[7]:
 
 
-thetas_benchmarks, xsecs_benchmarks, xsec_errors_benchmarks = sampler.cross_sections(
-    theta=sampling.benchmarks(list(sampler.benchmarks.keys()))
-)
+# thetas_benchmarks, xsecs_benchmarks, xsec_errors_benchmarks = sampler.cross_sections(
+#     theta=sampling.benchmarks(list(sampler.benchmarks.keys()))
+# )
 
-thetas_morphing, xsecs_morphing, xsec_errors_morphing = sampler.cross_sections(
-    theta=sampling.random_morphing_points(10, [('flat', 0., 3.)])
-)
+# thetas_morphing, xsecs_morphing, xsec_errors_morphing = sampler.cross_sections(
+#     theta=sampling.random_morphing_points(10, [('flat', 0., 16.)])
+# )
 
 
 # In[8]:
@@ -180,7 +183,7 @@ thetas_morphing, xsecs_morphing, xsec_errors_morphing = sampler.cross_sections(
 
 
 estimator = ParameterizedRatioEstimator(
-    n_hidden=(100,),
+    n_hidden=(300,),
     activation="tanh"
 )
 

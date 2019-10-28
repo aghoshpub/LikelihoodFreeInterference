@@ -34,3 +34,4 @@ combine_and_shuffle(
     delphesDatasetList,
     'data/delphes_data_shuffled.h5'
 )
+print ("Files combined: ",len(delphesDatasetList))

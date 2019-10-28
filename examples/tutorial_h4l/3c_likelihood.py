@@ -76,9 +76,9 @@ sampler = SampleAugmenter('data/delphes_data_shuffled.h5')
 
 
 x, theta, t_xz, _ = sampler.sample_train_density(
-    theta=sampling.random_morphing_points(10, [('flat', 0., 5.)]),
-    n_samples=4*10**5, #100000,
-    #n_samples=10**6,
+    theta=sampling.random_morphing_points(500, [('flat', 0., 16.)]),
+    #n_samples=4*10**5, #100000,
+    n_samples=3*10**6,
     folder='./data/samples',
     filename='train_density',
     sample_only_from_closest_benchmark=True,
@@ -90,12 +90,12 @@ x, theta, t_xz, _ = sampler.sample_train_density(
 # In[ ]:
 
 
-_ = sampler.sample_test(
-    theta=sampling.benchmark('sm'),
-    n_samples=5*10**4,
-    folder='./data/samples',
-    filename='test'
-)
+# _ = sampler.sample_test(
+#     theta=sampling.benchmark('sm'),
+#     n_samples=1*10**6,
+#     folder='./data/samples',
+#     filename='test'
+# )
 
 
 # ## 2. Train likelihood estimator
@@ -109,7 +109,7 @@ _ = sampler.sample_test(
 
 estimator = LikelihoodEstimator(
     n_mades=3,
-    n_hidden=(100,),
+    n_hidden=(300,),
     activation="tanh"
 )
 

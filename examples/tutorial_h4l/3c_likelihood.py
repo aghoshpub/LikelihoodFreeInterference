@@ -74,11 +74,13 @@ sampler = SampleAugmenter('data/delphes_data_shuffled.h5')
 
 # In[ ]:
 
-
+mpoints = np.array([0,0.5,0.7,0.8,0.9,0.95,0.98,1,1.02,1.05,1.1,1,2,1.5,1.8,2,3,4,4.5,5,5.5,6,7,8,9,10,12,16]) ** 0.25
+mpoints = [(t,1) for t in mpoints]
 x, theta, t_xz, _ = sampler.sample_train_density(
-    theta=sampling.random_morphing_points(500, [('flat', 0., 16.)]),
-    #n_samples=4*10**5, #100000,
-    n_samples=3*10**6,
+    #theta=sampling.random_morphing_points(500, [('flat', 0., 16.)]),
+    theta=sampling.morphing_points(mpoints),
+    n_samples=2*10**5, #100000,
+    #n_samples=3*10**6,
     folder='./data/samples',
     filename='train_density',
     sample_only_from_closest_benchmark=True,

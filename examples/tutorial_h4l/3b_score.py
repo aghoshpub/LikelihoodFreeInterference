@@ -67,8 +67,8 @@ sampler = SampleAugmenter('data/delphes_data_shuffled.h5')
 
 x, theta, t_xz, _ = sampler.sample_train_local(
     theta=sampling.benchmark('sm'),
-    #n_samples=4 * 10**5, #100000,
-    n_samples= 2*10**6, # fewer than others
+    n_samples=2 * 10**4, #100000,
+    #n_samples= 2*10**6, # fewer than others
     folder='./data/samples',
     filename='train_score'
 )

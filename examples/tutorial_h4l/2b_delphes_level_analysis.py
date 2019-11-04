@@ -107,9 +107,10 @@ subprocess.call(["sed", "-i", "-e",  "/iseed/s/0/{}/".format(runIteration*20 + 2
 
 # In[6]:
 
-#benchmarks = ['sm', 'no-higgs','5-higgs', '16-higgs']
-benchmarks = ['sm', 'no-higgs','0.8_k', '1.5_k']
-#additional_benchmarks = ['no-higgs', '5sq-higgs']
+
+benchmarks = ['sm', 'no-higgs','0.8_k', '1.5_k']; lheDir = './mg_processes/signal_pythia_all_runIter{}'.format(runIteration)
+#benchmarks = ['1.2_k']; lheDir = './mg_processes/signal_pythia_additional_runIter{}'.format(runIteration)
+#additional_benchmarks = ['1.2_k'] 
 
 # In[7]:
 
@@ -117,7 +118,7 @@ miner.run_multiple(
     #sample_benchmarks=additional_benchmarks,
     sample_benchmarks=benchmarks,
     mg_directory=mg_dir,
-    mg_process_directory='./mg_processes/signal_pythia_all_runIter{}'.format(runIteration),
+    mg_process_directory=lheDir,
     proc_card_file='cards/proc_card_signal.dat',
     param_card_template_file='cards/param_card_h4l_WZHModified_MGdefault_template.dat',
     pythia8_card_file='cards/pythia8_card.dat',
@@ -194,8 +195,8 @@ delphes = DelphesReader('data/setup.h5')
 
 for i, benchmark in enumerate(benchmarks):
     delphes.add_sample(
-        lhe_filename='mg_processes/signal_pythia_all_runIter{}/Events/run_0{}/unweighted_events.lhe.gz'.format(runIteration, i+1),
-        hepmc_filename='mg_processes/signal_pythia_all_runIter{}/Events/run_0{}/tag_1_pythia8_events.hepmc.gz'.format(runIteration, i+1),
+        lhe_filename=lheDir + '/Events/run_0{}/unweighted_events.lhe.gz'.format(i+1),
+        hepmc_filename=lheDir + '/Events/run_0{}/tag_1_pythia8_events.hepmc.gz'.format(i+1),
         sampled_from_benchmark=benchmark,
         is_background=False,
         #k_factor=1.1,

@@ -79,8 +79,8 @@ mpoints = [(t,1) for t in mpoints]
 x, theta, t_xz, _ = sampler.sample_train_density(
     #theta=sampling.random_morphing_points(500, [('flat', 0., 16.)]),
     theta=sampling.morphing_points(mpoints),
-    n_samples=2*10**5, #100000,
-    #n_samples=3*10**6,
+    #n_samples=2*10**5, #100000,
+    n_samples=2*10**6,
     folder='./data/samples',
     filename='train_density',
     sample_only_from_closest_benchmark=True,
@@ -111,7 +111,7 @@ x, theta, t_xz, _ = sampler.sample_train_density(
 
 estimator = LikelihoodEstimator(
     n_mades=3,
-    n_hidden=(300,),
+    n_hidden=(100,),
     activation="tanh"
 )
 

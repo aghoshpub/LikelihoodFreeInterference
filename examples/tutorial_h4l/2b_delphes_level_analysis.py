@@ -108,9 +108,9 @@ subprocess.call(["sed", "-i", "-e",  "/iseed/s/0/{}/".format(runIteration*20 + 2
 # In[6]:
 
 
-benchmarks = ['sm', 'no-higgs','0.8_k', '1.5_k']; lheDir = './mg_processes/signal_pythia_all_runIter{}'.format(runIteration)
-#benchmarks = ['1.2_k']; lheDir = './mg_processes/signal_pythia_additional_runIter{}'.format(runIteration)
-#additional_benchmarks = ['1.2_k'] 
+#benchmarks = ['sm', 'no-higgs','0.8_k', '1.5_k']; lheDir = './mg_processes/signal_pythia_all_runIter{}'.format(runIteration)
+benchmarks = ['sm', '1.2_k','1.35_k']; lheDir = './mg_processes/signal_pythia_additional_runIter{}'.format(runIteration)
+#additional_benchmarks = ['1.2_k','1.35_k'] 
 
 # In[7]:
 

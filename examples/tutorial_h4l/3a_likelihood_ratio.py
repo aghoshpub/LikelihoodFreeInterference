@@ -81,7 +81,7 @@ x, theta0, theta1, y, r_xz, t_xz, n_effective = sampler.sample_train_ratio(
     theta0=sampling.morphing_points(mpoints),
     theta1=sampling.benchmark('sm'),
     #n_samples=2*10**5, #100000,
-    n_samples=2* 10**6,
+    n_samples=3* 10**6,
     #n_samples=2* 10**3,
     folder='./data/samples',
     filename='train_ratio',
@@ -97,7 +97,7 @@ x, theta0, theta1, y, r_xz, t_xz, n_effective = sampler.sample_train_ratio(
 
 _ = sampler.sample_test(
     theta=sampling.benchmark('sm'),
-    n_samples=1*10**5,
+    n_samples=4*10**5,
     #n_samples=1*10**6,
     folder='./data/samples',
     filename='test'
@@ -205,7 +205,7 @@ estimator.train(
     r_xz='data/samples/r_xz_train_ratio.npy',
     t_xz='data/samples/t_xz_train_ratio.npy',
     alpha=1.,
-    n_epochs=20,
+    n_epochs=30,#20,
 )
 
 estimator.save('models/alices')

@@ -32,6 +32,7 @@ delphesDatasetList += [f for f in glob.glob(path + "delphes_data????.h5")]
 
 combine_and_shuffle(
     delphesDatasetList,
-    'data/delphes_data_shuffled.h5'
+    'data/delphes_data_shuffled.h5',
+    k_factors=0.00029507, # specific to 1k events in run card and suboptimal simulating!!!
 )
 print ("Files combined: ",len(delphesDatasetList))

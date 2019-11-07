@@ -205,7 +205,7 @@ estimator.train(
     r_xz='data/samples/r_xz_train_ratio.npy',
     t_xz='data/samples/t_xz_train_ratio.npy',
     alpha=1.,
-    n_epochs=30,#20,
+    n_epochs=20,#30,
 )
 
 estimator.save('models/alices')

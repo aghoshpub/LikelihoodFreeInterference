@@ -2,9 +2,9 @@
 # coding: utf-8
 
 # # MadMiner particle physics tutorial
-# 
+#
 # # Part 3a: Training a likelihood ratio estimator
-# 
+#
 # Johann Brehmer, Felix Kling, Irina Espejo, and Kyle Cranmer 2018-2019
 
 # In part 3a of this tutorial we will finally train a neural network to estimate likelihood ratios. We assume that you have run part 1 and 2a of this tutorial. If, instead of 2a, you have run part 2b, you just have to load a different filename later.
@@ -47,9 +47,9 @@ for key in logging.Logger.manager.loggerDict:
 # ## 1. Make (unweighted) training and test samples with augmented data
 
 # At this point, we have all the information we need from the simulations. But the data is not quite ready to be used for machine learning. The `madminer.sampling` class `SampleAugmenter` will take care of the remaining book-keeping steps before we can train our estimators:
-# 
+#
 # First, it unweights the samples, i.e. for a given parameter vector `theta` (or a distribution `p(theta)`) it picks events `x` such that their distribution follows `p(x|theta)`. The selected samples will all come from the event file we have so far, but their frequency is changed -- some events will appear multiple times, some will disappear.
-# 
+#
 # Second, `SampleAugmenter` calculates all the augmented data ("gold") that is the key to our new inference methods. Depending on the specific technique, these are the joint likelihood ratio and / or the joint score. It saves all these pieces of information for the selected events in a set of numpy files that can easily be used in any machine learning framework.
 
 # In[3]:
@@ -65,11 +65,11 @@ sampler = SampleAugmenter('data/delphes_data_shuffled.h5')
 # - `sample_train_ratio()` for techniques like CARL, ROLR, CASCAL, and RASCAL, when only theta0 is parameterized;
 # - `sample_train_more_ratios()` for the same techniques, but with both theta0 and theta1 parameterized;
 # - `sample_test()` for the evaluation of any method.
-# 
+#
 # For the arguments `theta`, `theta0`, or `theta1`, you can (and should!) use the helper functions `benchmark()`, `benchmarks()`, `morphing_point()`, `morphing_points()`, and `random_morphing_points()`, all defined in the `madminer.sampling` module.
-# 
+#
 # Here we'll train a likelihood ratio estimator with the ALICES method, so we focus on the `extract_samples_train_ratio()` function. We'll sample the numerator hypothesis in the likelihood ratio with 1000 points drawn from a Gaussian prior, and fix the denominator hypothesis to the SM.
-# 
+#
 # Note the keyword `sample_only_from_closest_benchmark=True`, which makes sure that for each parameter point we only use the events that were originally (in MG) generated from the closest benchmark. This reduces the statistical fluctuations in the outcome quite a bit.
 
 # In[4]:
@@ -81,7 +81,7 @@ x, theta0, theta1, y, r_xz, t_xz, n_effective = sampler.sample_train_ratio(
     theta0=sampling.morphing_points(mpoints),
     theta1=sampling.benchmark('sm'),
     #n_samples=2*10**5, #100000,
-    n_samples=3* 10**6,
+    n_samples=2* 10**6,
     #n_samples=2* 10**3,
     folder='./data/samples',
     filename='train_ratio',
@@ -180,7 +180,7 @@ _ = sampler.sample_test(
 # ## 3. Train likelihood ratio estimator
 
 # It's now time to build the neural network that estimates the likelihood ratio. The central object for this is the `madminer.ml.ParameterizedRatioEstimator` class. It defines functions that train, save, load, and evaluate the estimators.
-# 
+#
 # In the initialization, the keywords `n_hidden` and `activation` define the architecture of the (fully connected) neural network:
 
 # In[9]:
@@ -205,7 +205,7 @@ estimator.train(
     r_xz='data/samples/r_xz_train_ratio.npy',
     t_xz='data/samples/t_xz_train_ratio.npy',
     alpha=1.,
-    n_epochs=20,#30,
+    n_epochs=30,
 )
 
 estimator.save('models/alices')
@@ -254,7 +254,7 @@ estimator.save('models/alices')
 # best_fit = theta_grid[np.argmin(-2.*expected_llr)]
 
 # cmin, cmax = np.min(-2*expected_llr), np.max(-2*expected_llr)
-    
+
 # pcm = ax.pcolormesh(edges, edges, -2. * expected_llr.reshape((21,21)),
 #                     norm=matplotlib.colors.Normalize(vmin=cmin, vmax=cmax),
 #                     cmap='viridis_r')
@@ -276,5 +276,3 @@ estimator.save('models/alices')
 # # In[ ]:
 
 print("All done..")
-
-

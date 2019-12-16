@@ -129,7 +129,7 @@ miner.run_multiple(
     #run_card_files=['cards/run_card_signal_h4l.dat'],
     run_card_files=["temp/run_card_signal_h4l_runIter{}.dat".format(runIteration)],
     log_directory='logs/signal',
-    initial_command="conda activate madminer",#"source activate python2",
+    #initial_command="conda activate madminer",#"source activate python2",
     #initial_command="source activate python2",
     python2_override=True,
 )

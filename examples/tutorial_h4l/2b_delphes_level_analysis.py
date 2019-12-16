@@ -52,7 +52,9 @@ for key in logging.Logger.manager.loggerDict:
 
 
 #mg_dir = '/home/software/MG5_aMC_v2_6_2/'
-mg_dir = '../../../MG5_aMC_v2_6_2/'
+#mg_dir = '../../../MG5_aMC_v2_6_2/'
+#mg_dir = '../../../MG5_aMC_v2_6_7/'
+mg_dir = '/home/software/MG5_aMC_v2_6_7/'
 
 
 # ## 1. Generate events
@@ -77,7 +79,8 @@ miner.load("data/setup.h5")
 # In[5]:
 
 # Create new run card
-bashCommand = "cp cards/run_card_signal_h4l.dat temp/run_card_signal_h4l_runIter{}.dat".format(runIteration)
+#bashCommand = "cp cards/run_card_signal_h4l.dat temp/run_card_signal_h4l_runIter{}.dat".format(runIteration)
+bashCommand = "cp cards/run_card_signal_h4l_tiny.dat temp/run_card_signal_h4l_runIter{}.dat".format(runIteration)
 import subprocess
 process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
 output, error = process.communicate()
@@ -108,7 +111,8 @@ subprocess.call(["sed", "-i", "-e",  "/iseed/s/0/{}/".format(runIteration*20 + 2
 
 # In[6]:
 
-benchmarks = ['sm', 'no-higgs','0.5_k','0.8_k','0.9_k', '1.2_k','1.35_k', '1.5_k']; lheDir = './mg_processes/signal_pythia_all_runIter{}'.format(runIteration)
+#benchmarks = ['sm', 'no-higgs','0.5_k','0.8_k','0.9_k', '1.2_k','1.35_k', '1.5_k']; lheDir = 
+benchmarks = ['sm',]; lheDir = './mg_processes/signal_pythia_all_runIter{}'.format(runIteration)
 #benchmarks = ['sm', 'no-higgs','0.8_k', '1.5_k']; lheDir = './mg_processes/signal_pythia_all_runIter{}'.format(runIteration)
 #benchmarks = ['sm', '1.2_k','1.35_k']; lheDir = './mg_processes/signal_pythia_additional_runIter{}'.format(runIteration)
 #additional_benchmarks = ['1.2_k','1.35_k'] 
@@ -116,7 +120,7 @@ benchmarks = ['sm', 'no-higgs','0.5_k','0.8_k','0.9_k', '1.2_k','1.35_k', '1.5_k
 # In[7]:
 
 miner.run_multiple(
-    only_prepare_script=True,
+    #only_prepare_script=True,
     sample_benchmarks=benchmarks,
     mg_directory=mg_dir,
     mg_process_directory=lheDir,
@@ -127,6 +131,7 @@ miner.run_multiple(
     run_card_files=["temp/run_card_signal_h4l_runIter{}.dat".format(runIteration)],
     log_directory='logs/signal',
     initial_command="conda activate madminer",#"source activate python2",
+    python2_override=True,
 )
 
 
